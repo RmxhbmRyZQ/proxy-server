@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 import static stream.ChannelStream.BUFFER_CAPACITY;
 
@@ -28,13 +29,13 @@ public class SocksOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         int offset = 0;
-        if (len + count > BUFFER_CAPACITY && count > 0) {
+        if (len + count >= BUFFER_CAPACITY && count > 0) {
             flush();
         }
         while (offset < len) {
             if (len - offset < BUFFER_CAPACITY) {
-                System.arraycopy(b, off + offset, bytes, 0, len - offset);
-                count = len - offset;
+                System.arraycopy(b, off + offset, bytes, count, len - offset);
+                count += len - offset;
             } else {
                 byteBuffer.clear();
                 byteBuffer.put(b, off + offset, BUFFER_CAPACITY);
@@ -52,5 +53,12 @@ public class SocksOutputStream extends OutputStream {
         byteBuffer.flip();
         sc.write(byteBuffer);
         count = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "SocksOutputStream{" +
+                "bytes=" + new String(bytes, 0, count) +
+                '}';
     }
 }

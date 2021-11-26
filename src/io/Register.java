@@ -26,9 +26,9 @@ public class Register implements OnEven {
         if (select == null)
             return;
         try {
-            if (key.isAcceptable())  // accept 事件
+            if (key.isAcceptable())  // nattraverse.accept 事件
                 select.onAccept(key);
-            if (key.isConnectable())  // connect 事件
+            if (key.isConnectable())  // nattraverse.connect 事件
                 select.onConnect(key);
             if (key.isReadable())  // read 事件
                 select.onRead(key);

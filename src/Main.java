@@ -1,6 +1,5 @@
-package proxy;
-
 import io.Register;
+import proxy.ProxyServer;
 
 import java.io.IOException;
 

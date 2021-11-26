@@ -16,6 +16,17 @@ public class ChannelStream {
         this.sc = sc;
     }
 
+    public void writeLong(long l) throws IOException {
+        write((byte)(l >>> 56));
+        write((byte)(l >>> 48));
+        write((byte)(l >>> 40));
+        write((byte)(l >>> 32));
+        write((byte)(l >>> 24));
+        write((byte)(l >>> 16));
+        write((byte)(l >>> 8));
+        write((byte)(l >>> 0));
+    }
+
     public void write(int b) throws IOException {
         socksOutputStream.write(b);
     }
@@ -87,5 +98,16 @@ public class ChannelStream {
 
     public SocksOutputStream getSocksOutputStream() {
         return socksOutputStream;
+    }
+
+    public long readLong() throws IOException {
+        return (((long)read() << 56) +
+                ((long)(read() & 255) << 48) +
+                ((long)(read() & 255) << 40) +
+                ((long)(read() & 255) << 32) +
+                ((long)(read() & 255) << 24) +
+                ((read() & 255) << 16) +
+                ((read() & 255) <<  8) +
+                ((read() & 255) <<  0));
     }
 }

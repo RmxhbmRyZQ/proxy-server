@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 import static stream.ChannelStream.BUFFER_CAPACITY;
 
@@ -65,5 +66,12 @@ public class SocksInputStream extends InputStream {
             offset += min;
         }
         return offset != 0 ? offset : -1;
+    }
+
+    @Override
+    public String toString() {
+        return "SocksInputStream{" +
+                "extra=" + new String(extra, 0, limit) +
+                '}';
     }
 }
