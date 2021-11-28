@@ -31,14 +31,16 @@ public class Socks5 extends Socks {
     @Override
     public void onConnect(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();  // 转成客户端连接
-        socketChannel.finishConnect();
+        if (socketChannel.isConnectionPending()) {
+            socketChannel.finishConnect();
 
-        byte[] reply = {5, SocksConst.REQUEST_OK, 0, SocksConst.IPV4, 0, 0, 0, 0, 0, 0};  // 代理成功
-        stream.write(reply);
-        finish = true;  // 完成
+            byte[] reply = {5, SocksConst.REQUEST_OK, 0, SocksConst.IPV4, 0, 0, 0, 0, 0, 0};  // 代理成功
+            stream.write(reply);
+            finish = true;  // 完成
 
-        register.register(channel.getChannel(), SelectionKey.OP_WRITE, this);  // 目的端连接成功后可以响应信息了
-        register.register(dest, 0, null);  // 监听 OP_CONNECT 时可能 selector 会一直返回长度为 0 的 key，需要修改状态
+            register.register(channel.getChannel(), SelectionKey.OP_WRITE, this);  // 目的端连接成功后可以响应信息了
+            register.register(dest, 0, null);  // 监听 OP_CONNECT 时可能 selector 会一直返回长度为 0 的 key，需要修改状态
+        }
     }
 
     @Override
@@ -254,7 +256,7 @@ public class Socks5 extends Socks {
 
     private void destConnect(String domain, int port) throws IOException {
         dest = SocketChannel.open();
-        dest.configureBlocking(false);
+        configureSocket(dest);
         dest.connect(new InetSocketAddress(domain, port));
         destStream = new ChannelStream(dest);
         register.register(dest, SelectionKey.OP_CONNECT, this);

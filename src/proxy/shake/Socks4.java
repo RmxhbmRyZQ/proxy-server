@@ -27,9 +27,11 @@ public class Socks4 extends Socks {
     @Override
     public void onConnect(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();  // 转成客户端连接
-        socketChannel.finishConnect();
-        register.register(channel, SelectionKey.OP_WRITE, this);  // 目的端连接成功后可以响应信息了
-        register.register(dest, 0, null);  // 监听 OP_CONNECT 时可能 selector 会一直返回长度为 0 的 key，需要修改状态
+        if (socketChannel.isConnectionPending()) {
+            socketChannel.finishConnect();
+            register.register(channel, SelectionKey.OP_WRITE, this);  // 目的端连接成功后可以响应信息了
+            register.register(dest, 0, null);  // 监听 OP_CONNECT 时可能 selector 会一直返回长度为 0 的 key，需要修改状态
+        }
     }
 
     @Override
@@ -42,7 +44,7 @@ public class Socks4 extends Socks {
             int port = srcStream.readPort();
             String ip = srcStream.readIP();
             dest = SocketChannel.open();
-            dest.configureBlocking(false);
+            configureSocket(dest);
             dest.connect(new InetSocketAddress(ip, port));
             destStream = new ChannelStream(dest);
             register.register(dest, SelectionKey.OP_CONNECT, this);

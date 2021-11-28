@@ -1,11 +1,11 @@
-package traverse.accept;
+package traverse;
 
 import traverse.accept.server.ProxyServer;
 import io.Register;
 
 import java.io.IOException;
 
-public class Main {
+public class AcceptMain {
     public static void main(String[] args) {
         try {
             Register register = new Register();

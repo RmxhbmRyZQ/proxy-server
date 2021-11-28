@@ -1,6 +1,5 @@
 package traverse.connect;
 
-import callback.OnSelect;
 import io.Register;
 import proxy.Bridge;
 import stream.ChannelStream;
@@ -11,7 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.HashSet;
 
-public class Client implements OnSelect {
+public class Client extends io.Client {
     private final Register register;
     private final long l;
     private ChannelStream proxy;
@@ -26,23 +25,18 @@ public class Client implements OnSelect {
 
     public void connect(InetSocketAddress proxy, InetSocketAddress local) throws IOException {
         SocketChannel s1 = SocketChannel.open();
-        s1.configureBlocking(false);
+        configureSocket(s1);
         s1.connect(proxy);
         this.proxy = new ChannelStream(s1);
 
         SocketChannel s2 = SocketChannel.open();
-        s2.configureBlocking(false);
+        configureSocket(s2);
         s2.connect(local);
         this.local = new ChannelStream(s2);
 
         register.register(s1, SelectionKey.OP_CONNECT, this);
         register.register(s2, SelectionKey.OP_CONNECT, this);
         set.add(this);
-    }
-
-    @Override
-    public void onAccept(SelectionKey key) throws IOException {
-
     }
 
     @Override
@@ -53,7 +47,6 @@ public class Client implements OnSelect {
             System.out.println(l);
             proxy.write(1);
             proxy.writeLong(l);
-            proxy.clear();
             register.register(proxy.getChannel(), SelectionKey.OP_WRITE, this);
         } else {
             if (finish) {
@@ -64,11 +57,6 @@ public class Client implements OnSelect {
             }
             finish = true;
         }
-    }
-
-    @Override
-    public void onRead(SelectionKey key) throws IOException {
-
     }
 
     @Override

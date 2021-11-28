@@ -7,7 +7,6 @@ import stream.ChannelStream;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 
@@ -16,11 +15,8 @@ public class AcceptClient implements OnSolve {
     public void solve(ChannelStream sc, Register register) throws IOException {
         String s = sc.readIP();
         int i = sc.readPort();
+        AcceptServer acceptServer = new AcceptServer(sc, new InetSocketAddress(s, i), register);
         ServerSocketChannel ssc = ServerSocketChannel.open();  // 生成服务器Socket
-        ssc.configureBlocking(false);  // 设异步非阻塞
-        ServerSocket serverSocket = ssc.socket();  // 拿到服务器Socket
-        serverSocket.bind(new InetSocketAddress(s, i));  // 绑定地址与端口
-        AcceptServer acceptServer = new AcceptServer(sc, ssc, register);
         register.register(ssc, SelectionKey.OP_ACCEPT, acceptServer);
     }
 

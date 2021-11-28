@@ -1,6 +1,7 @@
 package io;
 
 import callback.OnEven;
+import callback.OnSelect;
 
 import java.io.IOException;
 import java.nio.channels.*;
@@ -16,8 +17,8 @@ public class IoLoop {
         this.even = even;
     }
 
-    public void register(SelectableChannel channel, int even) throws ClosedChannelException {
-        channel.register(selector, even);
+    public void register(SelectableChannel channel, int even, OnSelect select) throws ClosedChannelException {
+        channel.register(selector, even, select);
     }
 
     public void loop() throws IOException {

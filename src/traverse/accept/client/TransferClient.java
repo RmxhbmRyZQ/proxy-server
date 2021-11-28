@@ -15,7 +15,12 @@ public class TransferClient implements OnSolve {
     public void solve(ChannelStream sc, Register register) throws IOException {
         long p = sc.readLong();
         sc.clear();
-        SocketChannel socketChannel = AcceptServer.map.get(p).getSocketChannel();
+        AcceptServer acceptServer = AcceptServer.map.get(p);
+        if (acceptServer == null) {
+            register.cancel(sc.getChannel());
+            return;
+        }
+        SocketChannel socketChannel = acceptServer.getSocketChannel();
         if (socketChannel == null) {
             register.cancel(sc.getChannel());
             return;

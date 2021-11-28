@@ -1,24 +1,25 @@
 package proxy;
 
-import callback.OnSelect;
+import io.Client;
 import io.Register;
+import stream.ByteArray;
 import stream.ChannelStream;
+import stream.SystemBufferOverflowException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class Bridge implements OnSelect {
+public class Bridge extends Client {
     private final SocketChannel source;
     private final ChannelStream srcStream;
     private final SocketChannel destination;
     private final ChannelStream destStream;
     private final Register register;
-    private final ByteArrayOutputStream destinationOut = new ByteArrayOutputStream();
-    private final ByteArrayOutputStream sourceOut = new ByteArrayOutputStream();
+    private final ByteArray destOut = new ByteArray();
+    private final ByteArray srcOut = new ByteArray();
     private boolean close = false;
     private final byte[] bytes = new byte[1024];
 
@@ -31,21 +32,11 @@ public class Bridge implements OnSelect {
     }
 
     @Override
-    public void onAccept(SelectionKey key) throws IOException {
-
-    }
-
-    @Override
-    public void onConnect(SelectionKey key) {
-
-    }
-
-    @Override
     public void onRead(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();  // 转成客户端连接
 
         boolean select = socketChannel == source;
-        ByteArrayOutputStream outputStream = select ? destinationOut : sourceOut;
+        ByteArray outputStream = select ? destOut : srcOut;
         ChannelStream stream = select ? srcStream : destStream;
         int len;
         try {
@@ -59,7 +50,7 @@ public class Bridge implements OnSelect {
                     break;
                 }
                 outputStream.write(bytes, 0, len);  // 把数据读到数组，用于等会发送给另一个 channel
-                if (outputStream.size() > 1024 * 32)  // 当数组过大时，分配转发
+                if (outputStream.size() > 1024 * 64)  // 当数组过大时，分配转发
                     break;
             }
             register(select ? destination : source, SelectionKey.OP_WRITE);
@@ -78,16 +69,21 @@ public class Bridge implements OnSelect {
         SocketChannel socketChannel = (SocketChannel) key.channel();
 
         boolean select = socketChannel == source;
-        ByteArrayOutputStream outputStream = select ? sourceOut : destinationOut;
+        ByteArray outputStream = select ? srcOut : destOut;
         ChannelStream stream = select ? srcStream : destStream;
-
-        outputStream.writeTo(stream.getSocksOutputStream());
-        stream.flush();
+        try {
+            outputStream.writeTo(stream.getSocksOutputStream());
+        } catch (SystemBufferOverflowException e) {
+            int len = e.getLen();
+            outputStream.seek(len);
+            return;
+        }
         outputStream.reset();
+        stream.flush();
 
-        if (close)  // 如果对端关闭了，本端也关闭
+        if (close) {  // 如果对端关闭了，本端也关闭
             register.cancel(socketChannel);
-        else
+        } else
             register(socketChannel, SelectionKey.OP_READ);
     }
 

@@ -1,6 +1,5 @@
 package traverse.connect;
 
-import callback.OnSelect;
 import io.Register;
 import stream.ChannelStream;
 
@@ -10,7 +9,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class ProxyClient implements OnSelect {
+public class ProxyClient extends io.Client {
     private final InetSocketAddress proxy;
     private final InetSocketAddress bind;
     private final InetSocketAddress local;
@@ -31,11 +30,6 @@ public class ProxyClient implements OnSelect {
 
     public void register() throws ClosedChannelException {
         register.register(stream.getChannel(), SelectionKey.OP_CONNECT, this);
-    }
-
-    @Override
-    public void onAccept(SelectionKey key) throws IOException {
-
     }
 
     @Override

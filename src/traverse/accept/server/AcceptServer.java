@@ -2,9 +2,11 @@ package traverse.accept.server;
 
 import callback.OnSelect;
 import io.Register;
+import io.Server;
 import stream.ChannelStream;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
@@ -14,7 +16,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-public class AcceptServer implements OnSelect {
+public class AcceptServer extends Server {
     private final ChannelStream sc;
     private final ServerSocketChannel ssc;
     private final Register register;
@@ -22,9 +24,10 @@ public class AcceptServer implements OnSelect {
     public static final Map<Long, AcceptServer> map = new HashMap<>();
     private final Queue<SocketChannel> list = new LinkedList<>();
 
-    public AcceptServer(ChannelStream sc, ServerSocketChannel ssc, Register register) {
+    public AcceptServer(ChannelStream sc, InetSocketAddress bind, Register register) throws IOException {
         this.sc = sc;
-        this.ssc = ssc;
+        this.ssc = ServerSocketChannel.open();
+        configureServerSocket(ssc, bind);
         this.register = register;
     }
 
@@ -39,16 +42,6 @@ public class AcceptServer implements OnSelect {
         count++;
         register.register(sc.getChannel(), SelectionKey.OP_WRITE, this);
         register.register(socketChannel, 0, this);
-    }
-
-    @Override
-    public void onConnect(SelectionKey key) throws IOException {
-
-    }
-
-    @Override
-    public void onRead(SelectionKey key) throws IOException {
-
     }
 
     @Override
