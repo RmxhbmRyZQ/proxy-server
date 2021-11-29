@@ -1,4 +1,4 @@
-package proxy;
+package transfer;
 
 import io.Client;
 import io.Register;
@@ -53,7 +53,7 @@ public class Bridge extends Client {
                 if (outputStream.size() > 1024 * 64)  // 当数组过大时，分配转发
                     break;
             }
-            register(select ? destination : source, SelectionKey.OP_WRITE);
+            register(select ? destination : source, SelectionKey.OP_WRITE | SelectionKey.OP_READ);
         } catch (IOException e) {
             close();
         }

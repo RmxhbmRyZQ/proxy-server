@@ -3,7 +3,7 @@ package traverse.accept.client;
 import traverse.accept.server.AcceptServer;
 import callback.OnSolve;
 import io.Register;
-import proxy.Bridge;
+import transfer.Bridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -33,5 +33,6 @@ public class TransferClient implements OnSolve {
     @Override
     public void error(SelectionKey key, Exception e) {
         // 错误应该重发
+        e.printStackTrace();
     }
 }

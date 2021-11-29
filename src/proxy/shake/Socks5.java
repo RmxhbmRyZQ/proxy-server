@@ -1,7 +1,7 @@
 package proxy.shake;
 
 import io.Register;
-import proxy.Bridge;
+import transfer.Bridge;
 import stream.ChannelStream;
 
 import java.io.ByteArrayOutputStream;

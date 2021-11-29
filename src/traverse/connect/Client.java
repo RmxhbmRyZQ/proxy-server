@@ -1,7 +1,7 @@
 package traverse.connect;
 
 import io.Register;
-import proxy.Bridge;
+import transfer.Bridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -74,6 +74,7 @@ public class Client extends io.Client {
     @Override
     public void onError(SelectionKey key, Exception e) {
         try {
+            e.printStackTrace();
             close();
         } catch (IOException ioException) {
             ioException.printStackTrace();

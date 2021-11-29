@@ -8,7 +8,6 @@ import stream.ChannelStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.ServerSocketChannel;
 
 public class AcceptClient implements OnSolve {
     @Override
@@ -16,8 +15,7 @@ public class AcceptClient implements OnSolve {
         String s = sc.readIP();
         int i = sc.readPort();
         AcceptServer acceptServer = new AcceptServer(sc, new InetSocketAddress(s, i), register);
-        ServerSocketChannel ssc = ServerSocketChannel.open();  // 生成服务器Socket
-        register.register(ssc, SelectionKey.OP_ACCEPT, acceptServer);
+        acceptServer.register();
     }
 
     @Override

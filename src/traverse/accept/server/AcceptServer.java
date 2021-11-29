@@ -1,16 +1,12 @@
 package traverse.accept.server;
 
-import callback.OnSelect;
 import io.Register;
 import io.Server;
 import stream.ChannelStream;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -29,6 +25,10 @@ public class AcceptServer extends Server {
         this.ssc = ServerSocketChannel.open();
         configureServerSocket(ssc, bind);
         this.register = register;
+    }
+
+    public void register() throws ClosedChannelException {
+        register.register(ssc, SelectionKey.OP_ACCEPT, this);
     }
 
     @Override
