@@ -1,9 +1,9 @@
 package traverse.accept.client;
 
+import transfer.BlockBridge;
 import traverse.accept.server.AcceptServer;
 import callback.OnSolve;
 import io.Register;
-import transfer.Bridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class TransferClient implements OnSolve {
             return;
         }
         ChannelStream stream = new ChannelStream(socketChannel);
-        Bridge bridge = new Bridge(sc, stream, register);
+        BlockBridge bridge = new BlockBridge(sc, stream, register);
         bridge.registerAll(SelectionKey.OP_READ);
     }
 

@@ -1,7 +1,7 @@
 package traverse.connect;
 
 import io.Register;
-import transfer.Bridge;
+import transfer.BlockBridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class Client extends io.Client {
             register.register(proxy.getChannel(), SelectionKey.OP_WRITE, this);
         } else {
             if (finish) {
-                Bridge bridge = new Bridge(proxy, local, register);
+                BlockBridge bridge = new BlockBridge(proxy, local, register);
                 bridge.registerAll(SelectionKey.OP_READ);
             } else {
                 register.register(local.getChannel(), 0, this);
@@ -63,7 +63,7 @@ public class Client extends io.Client {
     public void onWrite(SelectionKey key) throws IOException {
         proxy.flush();
         if (finish) {
-            Bridge bridge = new Bridge(proxy, local, register);
+            BlockBridge bridge = new BlockBridge(proxy, local, register);
             bridge.registerAll(SelectionKey.OP_READ);
         } else {
             register.register(proxy.getChannel(), 0, this);

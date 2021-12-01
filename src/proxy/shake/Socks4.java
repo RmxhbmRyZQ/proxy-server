@@ -1,7 +1,7 @@
 package proxy.shake;
 
 import io.Register;
-import transfer.Bridge;
+import transfer.BlockBridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class Socks4 extends Socks {
             register.cancel(channel);
             register.cancel(dest);
         } else {
-            Bridge bridge = new Bridge(srcStream, destStream, register);
+            BlockBridge bridge = new BlockBridge(srcStream, destStream, register);
             bridge.registerAll(SelectionKey.OP_READ);
         }
     }

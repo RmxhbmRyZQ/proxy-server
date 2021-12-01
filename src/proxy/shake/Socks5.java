@@ -1,7 +1,7 @@
 package proxy.shake;
 
 import io.Register;
-import transfer.Bridge;
+import transfer.BlockBridge;
 import stream.ChannelStream;
 
 import java.io.ByteArrayOutputStream;
@@ -59,7 +59,7 @@ public class Socks5 extends Socks {
             register.cancel(channel.getChannel());
             register.cancel(dest);
         } else if (finish) {  // 完成开始数据转发
-            Bridge bridge = new Bridge(channel, destStream, register);
+            BlockBridge bridge = new BlockBridge(channel, destStream, register);
             bridge.registerAll(SelectionKey.OP_READ);
         }
     }
