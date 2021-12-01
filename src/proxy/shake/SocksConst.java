@@ -1,5 +1,8 @@
 package proxy.shake;
 
+/**
+ * socket 的常量，直接复制源码的
+ */
 public class SocksConst {
     public static final int PROTO_VERS4 = 4;
     public static final int PROTO_VERS = 5;

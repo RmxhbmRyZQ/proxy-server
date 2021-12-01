@@ -7,6 +7,10 @@ import java.nio.channels.SocketChannel;
 
 import static stream.ChannelStream.BUFFER_CAPACITY;
 
+/**
+ * 缓冲要发送的数据
+ * 缓冲区满了就发送
+ */
 public class SocksOutputStream extends OutputStream {
     private final SocketChannel sc;
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(BUFFER_CAPACITY);
@@ -56,7 +60,7 @@ public class SocksOutputStream extends OutputStream {
         byteBuffer.put(bytes, 0, count);
         byteBuffer.flip();
         int write = sc.write(byteBuffer);
-        if (write != count) {
+        if (write != count) {  // 当系统缓冲区满时
             if (write > 0) {
                 System.arraycopy(bytes, 0, bytes, write, count - write);
                 count -= write;

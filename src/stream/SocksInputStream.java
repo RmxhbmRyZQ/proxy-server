@@ -8,6 +8,10 @@ import java.util.Arrays;
 
 import static stream.ChannelStream.BUFFER_CAPACITY;
 
+/**
+ * 读数据时先从缓冲区读入
+ * 当缓冲区为空时再从网络读数据
+ */
 public class SocksInputStream extends InputStream {
     private final SocketChannel sc;
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(BUFFER_CAPACITY);
@@ -73,5 +77,9 @@ public class SocksInputStream extends InputStream {
         return "SocksInputStream{" +
                 "extra=" + new String(extra, 0, limit) +
                 '}';
+    }
+
+    public boolean require(int i) {
+        return i >= limit - pos;
     }
 }

@@ -1,15 +1,14 @@
 package proxy.shake;
 
-import callback.OnSelect;
+import io.Client;
 import io.Register;
 import stream.ChannelStream;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class ShakeHand implements OnSelect {
+public class ShakeHand extends Client {
     private final SocketChannel sc;
     private final Register register;
     private final ChannelStream stream;
@@ -22,16 +21,6 @@ public class ShakeHand implements OnSelect {
     }
 
     @Override
-    public void onAccept(SelectionKey key) throws IOException {
-
-    }
-
-    @Override
-    public void onConnect(SelectionKey key) throws ClosedChannelException {
-
-    }
-
-    @Override
     public void onRead(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();  // 转成客户端连接
         try {
@@ -41,10 +30,10 @@ public class ShakeHand implements OnSelect {
                 return;
             }
 
-            if (protocol == SocksConst.PROTO_VERS4) {
+            if (protocol == SocksConst.PROTO_VERS4) {  // socks4 协议
                 socks = new Socks4(stream, register);
                 socks.solve();
-            } else if (protocol == SocksConst.PROTO_VERS){
+            } else if (protocol == SocksConst.PROTO_VERS){  // socks5 协议
                 socks = new Socks5(stream, register);
                 socks.solve();
             } else {  // 出错

@@ -12,6 +12,9 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+/**
+ * 直接使用字节数据交换数据
+ */
 public class Bridge extends Client {
     private final SocketChannel source;
     private final ChannelStream srcStream;

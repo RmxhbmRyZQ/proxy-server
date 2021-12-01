@@ -101,6 +101,7 @@ public class ChannelStream {
     }
 
     public long readLong() throws IOException {
+        if(!socksInputStream.require(8)) return -1;
         return (((long)read() << 56) +
                 ((long)(read() & 255) << 48) +
                 ((long)(read() & 255) << 40) +

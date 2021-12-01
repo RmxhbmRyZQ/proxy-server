@@ -20,12 +20,17 @@ public class Client extends io.Client {
 
     @Override
     public void onRead(SelectionKey key) throws IOException {
-        switch (sc.read()) {
-            case 0:
+        int r = sc.read();
+        if (r == -1) {
+            register.cancel(key.channel());
+            return;
+        }
+        switch (r) {
+            case 0:  // 处理监听操作
                 solve = new AcceptClient();
                 solve.solve(sc, register);
                 break;
-            case 1:
+            case 1:  // 处理数据交换操作
                 solve = new TransferClient();
                 solve.solve(sc, register);
                 break;

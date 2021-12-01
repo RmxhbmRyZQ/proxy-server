@@ -11,6 +11,9 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+/**
+ * 使用空闲块管理来进行交换数据
+ */
 public class BlockBridge extends Client {
     private final SocketChannel source;
     private final ChannelStream srcStream;
@@ -35,13 +38,12 @@ public class BlockBridge extends Client {
         boolean select = socketChannel == source;
         ChannelStream stream = select ? srcStream : destStream;
         try {
-            if (buffer.readFrom(stream.getSocksInputStream(), !select) == -1){
+            if (buffer.readFrom(stream.getSocksInputStream(), !select) == -1) {
                 register.cancel(socketChannel);
                 close = true;
             }
             register(select ? destination : source, SelectionKey.OP_WRITE | SelectionKey.OP_READ);
         } catch (IOException e) {
-            e.printStackTrace();
             close();
         }
     }
@@ -57,9 +59,9 @@ public class BlockBridge extends Client {
 
         boolean select = socketChannel == source;
         ChannelStream stream = select ? srcStream : destStream;
-        int w = buffer.writeTo(stream.getSocksOutputStream(), select);
-
-        stream.flush();
+        if (!buffer.writeTo(stream.getSocksOutputStream(), select) ||
+                !buffer.flush(stream.getSocksOutputStream()))
+            return;
 
         if (close) {  // 如果对端关闭了，本端也关闭
             register.cancel(socketChannel);
@@ -83,5 +85,13 @@ public class BlockBridge extends Client {
 
     public void register(SelectableChannel channel, int even) throws ClosedChannelException {
         register.register(channel, even, this);
+    }
+
+    @Override
+    public String toString() {
+        return "BlockBridge{" +
+                "source=" + source +
+                ", destination=" + destination +
+                '}';
     }
 }

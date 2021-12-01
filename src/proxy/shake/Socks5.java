@@ -197,6 +197,7 @@ public class Socks5 extends Socks {
             password = new String(bytes, 0, len);
         }
         // 认证用户名密码
+        if (password == null) return false;
         return userName.equals("RmxhbmRyZQ") && password.equals("123456");
     }
 

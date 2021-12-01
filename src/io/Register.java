@@ -23,9 +23,9 @@ public class Register implements OnEven {
         if (select == null)
             return;
         try {
-            if (key.isAcceptable())  // nattraverse.accept 事件
+            if (key.isAcceptable())  // accept 事件
                 select.onAccept(key);
-            if (key.isConnectable())  // nattraverse.connect 事件
+            if (key.isConnectable())  // connect 事件
                 select.onConnect(key);
             if (key.isReadable())  // read 事件
                 select.onRead(key);
@@ -44,12 +44,18 @@ public class Register implements OnEven {
         }
     }
 
+    /**
+     * 注册事件
+     */
     public void register(SelectableChannel sc, int even, OnSelect select)
             throws ClosedChannelException {
         if (!sc.isOpen()) return;
         loop.register(sc, even, select);
     }
 
+    /**
+     * 取消事件，并关闭连接
+     */
     public void cancel(SelectableChannel channel) throws IOException {
         if (channel == null || !channel.isOpen()) return;
         channel.close();

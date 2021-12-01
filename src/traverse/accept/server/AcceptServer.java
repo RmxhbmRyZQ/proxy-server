@@ -29,6 +29,7 @@ public class AcceptServer extends Server {
 
     public void register() throws ClosedChannelException {
         register.register(ssc, SelectionKey.OP_ACCEPT, this);
+        register.register(sc.getChannel(), SelectionKey.OP_READ, this);
     }
 
     @Override
@@ -37,8 +38,8 @@ public class AcceptServer extends Server {
         SocketChannel socketChannel = serverSocketChannel.accept();  // 与客户端建立连接
         socketChannel.configureBlocking(false);  // 给新连接设立异步非阻塞
         map.put(count, this);
-        list.add(socketChannel);
-        sc.writeLong(count);
+        list.add(socketChannel);  // 放入等待池
+        sc.writeLong(count);  // 把 ID 交给对方
         count++;
         register.register(sc.getChannel(), SelectionKey.OP_WRITE, this);
         register.register(socketChannel, 0, this);
@@ -51,21 +52,42 @@ public class AcceptServer extends Server {
     }
 
     @Override
+    public void onRead(SelectionKey key) throws IOException {
+        close();
+    }
+
+    @Override
     public void onError(SelectionKey key, Exception e) {
         SelectableChannel channel = key.channel();
-        if (channel == ssc) {
-            try {
-                for (SocketChannel c : list) {
-                    register.cancel(c);
-                }
-                register.cancel(sc.getChannel());
-                list.clear();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+        if (channel == ssc || channel == sc.getChannel()) {
+            close();
         } else {
             list.remove((SocketChannel) channel);
         }
+    }
+
+    /**
+     * 关闭有关的所有连接
+     */
+    private void close() {
+        for (SocketChannel c : list) {
+            try {
+                register.cancel(c);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+        try {
+            register.cancel(sc.getChannel());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        try {
+            register.cancel(ssc);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        list.clear();
     }
 
     public SocketChannel getSocketChannel() {

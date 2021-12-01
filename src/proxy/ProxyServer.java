@@ -15,10 +15,10 @@ public class ProxyServer extends Server {
     ServerSocketChannel ssc;
     protected Register register;
 
-    public ProxyServer(Register register) throws IOException {
+    public ProxyServer(String ip, int port, Register register) throws IOException {
         this.register = register;
         ssc = ServerSocketChannel.open();  // 生成服务器Socket
-        configureServerSocket(ssc, new InetSocketAddress("0.0.0.0", 8080));
+        configureServerSocket(ssc, new InetSocketAddress(ip, port));
     }
 
     public void register() throws ClosedChannelException {
