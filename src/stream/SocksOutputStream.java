@@ -14,8 +14,6 @@ import static stream.ChannelStream.BUFFER_CAPACITY;
 public class SocksOutputStream extends OutputStream {
     private final SocketChannel sc;
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(BUFFER_CAPACITY);
-    private final byte[] bytes = new byte[BUFFER_CAPACITY];
-    private int count = 0;
 
     public SocksOutputStream(SocketChannel sc) {
         this.sc = sc;
@@ -23,57 +21,55 @@ public class SocksOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        if (count == BUFFER_CAPACITY) {
+        if (!byteBuffer.hasRemaining()) {
             flush();
         }
-        bytes[count++] = (byte) b;
+        byteBuffer.put((byte) b);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        int offset = 0, write;
-        if (len + count >= BUFFER_CAPACITY && count > 0) {
-            flush();
-        }
-
+        int offset = 0, min;
         while (offset < len) {
-            if (len - offset < BUFFER_CAPACITY) {
-                System.arraycopy(b, off + offset, bytes, count, len - offset);
-                count += len - offset;
-                offset += len - offset;
-            } else {
-                byteBuffer.clear();
-                byteBuffer.put(b, off + offset, BUFFER_CAPACITY);
-                byteBuffer.flip();
-                write = sc.write(byteBuffer);
-                if (write < BUFFER_CAPACITY) {  // 如果系统缓冲区满了
-                    throw new SystemBufferOverflowException(offset);
+            if (!byteBuffer.hasRemaining()) {
+                try {
+                    flush();
+                } catch (SystemBufferOverflowException e) {
+                    e.setLen(offset);
+                    throw e;
                 }
-                offset += write;
+            } else {
+                min = Math.min(len - offset, byteBuffer.remaining());
+                byteBuffer.put(b, offset + off, min);
+                offset += min;
             }
         }
     }
 
     @Override
     public void flush() throws IOException {
-        byteBuffer.clear();
-        byteBuffer.put(bytes, 0, count);
+        int should, write, p, l;
+        p = byteBuffer.position();  // 记录状态
+        l = byteBuffer.limit();
         byteBuffer.flip();
-        int write = sc.write(byteBuffer);
-        if (write != count) {  // 当系统缓冲区满时
+        should = byteBuffer.remaining();
+        write = sc.write(byteBuffer);
+        if (write != should) {  // 当系统缓冲区满时
             if (write > 0) {
-                System.arraycopy(bytes, 0, bytes, write, count - write);
-                count -= write;
+                byteBuffer.compact();
+            } else {  // 回滚状态
+                byteBuffer.position(p);
+                byteBuffer.limit(l);
             }
             throw new SystemBufferOverflowException(0);
         }
-        count = 0;
+        byteBuffer.clear();
     }
 
     @Override
     public String toString() {
         return "SocksOutputStream{" +
-                "bytes=" + new String(bytes, 0, count) +
+                "bytes=" + byteBuffer +
                 '}';
     }
 }

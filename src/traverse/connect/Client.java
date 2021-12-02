@@ -5,7 +5,6 @@ import transfer.BlockBridge;
 import stream.ChannelStream;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;

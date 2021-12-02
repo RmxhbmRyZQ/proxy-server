@@ -3,7 +3,7 @@ package stream;
 import java.io.IOException;
 
 public class SystemBufferOverflowException extends IOException {
-    private final int len;
+    private int len;
 
     public SystemBufferOverflowException(int len) {
         this.len = len;
@@ -11,5 +11,9 @@ public class SystemBufferOverflowException extends IOException {
 
     public int getLen() {
         return len;
+    }
+
+    public void setLen(int len) {
+        this.len = len;
     }
 }
