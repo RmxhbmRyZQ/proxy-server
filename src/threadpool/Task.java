@@ -1,26 +1,23 @@
-package io;
+package threadpool;
 
-import callback.OnEven;
 import callback.OnSelect;
 import stream.SystemBufferOverflowException;
-import threadpool.ThreadPool;
 
 import java.io.IOException;
 import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 
-public class Register implements OnEven {
-    private final IoLoop loop;
+public class Task {
+    private final OnSelect select;
+    private final SelectionKey key;
 
-    public Register() throws IOException {
-        loop = new IoLoop(this);
+    public Task(OnSelect select, SelectionKey selectionKey) {
+        this.select = select;
+        this.key = selectionKey;
     }
 
-    @Override
-    public void callback(SelectionKey key) {
-        OnSelect select = (OnSelect) key.attachment();
+    public void callback() {
         try {
             if (key.isAcceptable())  // accept 事件
                 select.onAccept(key);
@@ -30,6 +27,7 @@ public class Register implements OnEven {
                 select.onRead(key);
             if (key.isWritable())  // write 事件
                 select.onWrite(key);
+            OnSelect select = (OnSelect) key.attachment();
         } catch (SystemBufferOverflowException e) {
             // TODO: 2021/11/28 nothing
         } catch (CancelledKeyException | IOException e) {
@@ -44,23 +42,10 @@ public class Register implements OnEven {
     }
 
     /**
-     * 注册事件
-     */
-    public void register(SelectableChannel sc, int even, OnSelect select)
-            throws ClosedChannelException {
-        if (!sc.isOpen()) return;
-        loop.register(sc, even, select);
-    }
-
-    /**
      * 取消事件，并关闭连接
      */
     public void cancel(SelectableChannel channel) throws IOException {
         if (channel == null || !channel.isOpen()) return;
         channel.close();
-    }
-
-    public IoLoop getLoop() {
-        return loop;
     }
 }

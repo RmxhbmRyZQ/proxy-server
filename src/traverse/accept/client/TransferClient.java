@@ -20,7 +20,7 @@ public class TransferClient implements OnSolve {
             register.cancel(sc.getChannel());
             return;
         }
-        SocketChannel socketChannel = acceptServer.getSocketChannel();
+        SocketChannel socketChannel = acceptServer.getSocketChannel(p);
         if (socketChannel == null) {
             register.cancel(sc.getChannel());
             return;

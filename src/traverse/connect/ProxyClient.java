@@ -47,7 +47,6 @@ public class ProxyClient extends io.Client {
         boolean close = true;
         while (true) {
             long l = stream.readLong();  // 读取 ID 标识
-            System.out.println(l);
             if (l == -1) {
                 if (close) {  // 对方已经关闭服务器了
                     register.cancel(stream.getChannel());

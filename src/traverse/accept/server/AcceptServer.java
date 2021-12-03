@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 public class AcceptServer extends Server {
     private final ChannelStream sc;
@@ -18,7 +16,7 @@ public class AcceptServer extends Server {
     private final Register register;
     private static long count = 0;
     public static final Map<Long, AcceptServer> map = new HashMap<>();
-    private final Queue<SocketChannel> list = new LinkedList<>();
+    public final Map<Long, SocketChannel> list = new HashMap<>();
 
     public AcceptServer(ChannelStream sc, InetSocketAddress bind, Register register) throws IOException {
         this.sc = sc;
@@ -38,7 +36,7 @@ public class AcceptServer extends Server {
         SocketChannel socketChannel = serverSocketChannel.accept();  // 与客户端建立连接
         socketChannel.configureBlocking(false);  // 给新连接设立异步非阻塞
         map.put(count, this);
-        list.add(socketChannel);  // 放入等待池
+        list.put(count, socketChannel);  // 放入等待池
         sc.writeLong(count);  // 把 ID 交给对方
         count++;
         register.register(sc.getChannel(), SelectionKey.OP_WRITE, this);
@@ -70,7 +68,7 @@ public class AcceptServer extends Server {
      * 关闭有关的所有连接
      */
     private void close() {
-        for (SocketChannel c : list) {
+        for (SocketChannel c : list.values()) {
             try {
                 register.cancel(c);
             } catch (IOException ioException) {
@@ -90,7 +88,7 @@ public class AcceptServer extends Server {
         list.clear();
     }
 
-    public SocketChannel getSocketChannel() {
-        return list.poll();
+    public SocketChannel getSocketChannel(long id) {
+        return list.get(id);
     }
 }

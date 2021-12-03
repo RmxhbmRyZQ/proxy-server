@@ -9,6 +9,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class IoLoop {
+    /**
+     * 开启线程池有两种方法
+     * 1.在线程池的任务处理完后才进行
+     */
     private final Selector selector;
     private final OnEven even;
 
@@ -23,7 +27,7 @@ public class IoLoop {
 
     public void loop() throws IOException {
         while (true) {
-            selector.select(0);  // 监听,返回事件的数量
+            selector.select(10);  // 监听,返回事件的数量
             Set<SelectionKey> selectionKeys = selector.selectedKeys();// 返回有事件的连接
             Iterator<SelectionKey> it = selectionKeys.iterator();  // 生成迭代器
 

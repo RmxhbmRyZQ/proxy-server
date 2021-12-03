@@ -1,23 +1,20 @@
 package test;
 
-import stream.BlockList;
+import callback.OnEven;
+import callback.OnSelect;
+import io.Client;
+import stream.block.TransferBlockList;
+import threadpool.ThreadPool;
+import threadpool.Worker;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
+import java.util.LinkedList;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        BlockList blockList = new BlockList();
-        byte[] bytes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        ByteArrayInputStream bais;
-        ByteArrayOutputStream baos;
-        bais = new ByteArrayInputStream(bytes);
-        blockList.readFrom(bais, false);
-        bais = new ByteArrayInputStream(bytes);
-        blockList.readFrom(bais, false);
-        baos = new ByteArrayOutputStream();
-        blockList.writeTo(baos, true);
-        int b = 0;
+        OnSelect a = new Client();
     }
 }
