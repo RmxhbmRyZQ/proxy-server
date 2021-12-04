@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class Client extends OnSelect {
+public class Client implements OnSelect {
     @Override
     public void onAccept(SelectionKey key) throws IOException {
 

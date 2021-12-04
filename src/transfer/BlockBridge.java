@@ -2,7 +2,7 @@ package transfer;
 
 import io.Client;
 import io.Register;
-import stream.block.TransferBlockList;
+import stream.BlockList;
 import stream.ChannelStream;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class BlockBridge extends Client {
     private final SocketChannel destination;
     private final ChannelStream destStream;
     private final Register register;
-    private final TransferBlockList buffer = new TransferBlockList();
+    private final BlockList buffer = new BlockList();
     private boolean close = false;
 
     public BlockBridge(ChannelStream srcStream, ChannelStream destStream, Register register) {

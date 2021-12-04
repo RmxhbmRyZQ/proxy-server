@@ -3,7 +3,6 @@ package io;
 import callback.OnEven;
 import callback.OnSelect;
 import stream.SystemBufferOverflowException;
-import threadpool.ThreadPool;
 
 import java.io.IOException;
 import java.nio.channels.CancelledKeyException;
@@ -21,6 +20,8 @@ public class Register implements OnEven {
     @Override
     public void callback(SelectionKey key) {
         OnSelect select = (OnSelect) key.attachment();
+        if (select == null)
+            return;
         try {
             if (key.isAcceptable())  // accept 事件
                 select.onAccept(key);

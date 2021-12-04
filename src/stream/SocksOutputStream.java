@@ -31,14 +31,14 @@ public class SocksOutputStream extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         int offset = 0, min;
         while (offset < len) {
-            if (!byteBuffer.hasRemaining()) {  // 没有空间时刷新缓冲区
+            if (!byteBuffer.hasRemaining()) {
                 try {
                     flush();
                 } catch (SystemBufferOverflowException e) {
                     e.setLen(offset);
                     throw e;
                 }
-            } else {  // 把缓冲区写满
+            } else {
                 min = Math.min(len - offset, byteBuffer.remaining());
                 byteBuffer.put(b, offset + off, min);
                 offset += min;

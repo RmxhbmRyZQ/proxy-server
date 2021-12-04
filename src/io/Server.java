@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 
-public class Server extends OnSelect {
+public class Server implements OnSelect {
     @Override
     public void onAccept(SelectionKey key) throws IOException {
 

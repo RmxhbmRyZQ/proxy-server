@@ -3,10 +3,6 @@ import proxy.ProxyServer;
 
 import java.io.IOException;
 
-/**
- * 代理服务器
- * @author RmxhbmRyZQ 2021.12.2
- */
 public class Main {
     public static void main(String[] args) {
         try {
